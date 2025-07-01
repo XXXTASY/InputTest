@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Penguji Keyboard, Mouse & Gamepad</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+        padding: 20px;
+      }
+
+      h1 {
+        color: #569cd6;
+      }
+
+      .tab-nav {
+        margin-bottom: 20px;
+      }
+
+      .tab-button {
+        padding: 10px 20px;
+        cursor: pointer;
+        border: 1px solid #333;
+        background-color: #252526;
+        color: #ccc;
+        margin: 0 5px;
+        border-radius: 5px;
+        font-size: 16px;
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      .tab-button:hover {
+        background-color: #3e3e42;
+      }
+
+      .tab-button.active {
+        background-color: #007acc;
+        color: white;
+        border-color: #007acc;
+      }
+      .tester-content {
+        display: none;
+        width: 100%;
+        max-width: 900px;
+        background-color: #252526;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #333;
+      }
+
+      .tester-content.active {
+        display: block;
+      }
+
+      h2 {
+        margin-top: 0;
+        border-bottom: 2px solid #569cd6;
+        padding-bottom: 10px;
+      }
+
+      #key-info {
+        background-color: #1e1e1e;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 1.1em;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+      }
+      #keyboard-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .key-row {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+      }
+      .key {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        min-width: 40px;
+        height: 40px;
+        border: 1px solid #444;
+        background-color: #3e3e42;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: all 0.1s ease;
+        box-sizing: border-box;
+      }
+      .key.active {
+        background-color: #007acc;
+        color: white;
+        transform: scale(0.95);
+        box-shadow: 0 0 10px #007acc;
+      }
+      .key-space {
+        width: 400px;
+      }
+      .key-backspace {
+        width: 100px;
+      }
+      .key-tab,
+      .key-caps,
+      .key-enter,
+      .key-shift {
+        width: 120px;
+      }
+      .key-ctrl,
+      .key-alt {
+        width: 70px;
+      }
+
+      #mouse-area {
+        width: 100%;
+        height: 300px;
+        background-color: #333;
+        border: 2px dashed #569cd6;
+        border-radius: 5px;
+        margin-top: 20px;
+        cursor: crosshair;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5em;
+        color: #666;
+      }
+      #mouse-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+        font-size: 1.2em;
+        text-align: center;
+      }
+      .info-box {
+        background-color: #1e1e1e;
+        padding: 15px;
+        border-radius: 5px;
+      }
+      .info-box span {
+        display: block;
+        font-weight: bold;
+        color: #007acc;
+      }
+      #gamepad-status {
+        font-size: 1.2em;
+        padding: 15px;
+        background-color: #3e3e42;
+        border-radius: 5px;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      #gamepad-display.connected #gamepad-status {
+        background-color: #2c6e2c;
+      }
+      #gamepad-info {
+        font-family: "Courier New", Courier, monospace;
+        margin-bottom: 20px;
+      }
+      .gamepad-controls {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+      }
+      #gamepad-buttons,
+      #gamepad-axes {
+        margin: 10px;
+      }
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        margin: 5px;
+        border: 2px solid #555;
+        border-radius: 50%;
+        background-color: #3e3e42;
+        transition: background-color 0.1s, transform 0.1s;
+      }
+      .button.pressed {
+        background-color: #569cd6;
+        transform: scale(1.1);
+        color: #fff;
+      }
+      .axis {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        border: 2px solid #555;
+        border-radius: 50%;
+        background-color: #333;
+        margin: 10px 20px;
+      }
+      .axis-dot {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background-color: #d16a6a;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        top: 50%;
+        left: 50%;
+      }
+      .axis-label {
+        text-align: center;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Alat Uji Input Universal</h1>
+
+    <nav class="tab-nav">
+      <button class="tab-button active" onclick="showTester('keyboard')">
+        Keyboard
+      </button>
+      <button class="tab-button" onclick="showTester('mouse')">Mouse</button>
+      <button class="tab-button" onclick="showTester('gamepad')">
+        Gamepad
+      </button>
+    </nav>
+
+    <div id="keyboard-tester" class="tester-content active">
+      <h2>Penguji Keyboard</h2>
+      <div id="key-info">
+        <div>Key: <span id="key-display">-</span></div>
+        <div>Code: <span id="code-display">-</span></div>
+        <div>Location: <span id="location-display">-</span></div>
+        <div>Which: <span id="which-display">-</span></div>
+      </div>
+      <div id="keyboard-layout"></div>
+    </div>
+
+    <div id="mouse-tester" class="tester-content">
+      <h2>Penguji Mouse</h2>
+      <div id="mouse-area">Letakkan mouse Anda di sini</div>
+      <div id="mouse-info">
+        <div class="info-box">Koordinat X <span id="x-coord">0</span></div>
+        <div class="info-box">Koordinat Y <span id="y-coord">0</span></div>
+        <div class="info-box">
+          Tombol Ditekan <span id="mouse-button">-</span>
+        </div>
+        <div class="info-box">Scroll Roda <span id="mouse-scroll">-</span></div>
+      </div>
+    </div>
+
+    <div id="gamepad-tester" class="tester-content">
+      <h2>Penguji Gamepad</h2>
+      <div id="gamepad-display">
+        <div id="gamepad-status">Menunggu koneksi gamepad...</div>
+        <div id="gamepad-info"></div>
+        <div class="gamepad-controls">
+          <div id="gamepad-buttons"><h3>Tombol</h3></div>
+          <div id="gamepad-axes"><h3>Sumbu (Analog)</h3></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const tabs = document.querySelectorAll(".tab-button");
+      const contents = document.querySelectorAll(".tester-content");
+
+      function showTester(testerId) {
+        contents.forEach((content) => {
+          content.classList.remove("active");
+        });
+        tabs.forEach((tab) => {
+          tab.classList.remove("active");
+        });
+
+        document.getElementById(`${testerId}-tester`).classList.add("active");
+        document
+          .querySelector(`[onclick="showTester('${testerId}')"]`)
+          .classList.add("active");
+      }
+
+      const keyDisplay = document.getElementById("key-display");
+      const codeDisplay = document.getElementById("code-display");
+      const locationDisplay = document.getElementById("location-display");
+      const whichDisplay = document.getElementById("which-display");
+      const keyboardLayoutDiv = document.getElementById("keyboard-layout");
+
+      const keyLayout = [
+        [
+          "Backquote",
+          "Digit1",
+          "Digit2",
+          "Digit3",
+          "Digit4",
+          "Digit5",
+          "Digit6",
+          "Digit7",
+          "Digit8",
+          "Digit9",
+          "Digit0",
+          "Minus",
+          "Equal",
+          { code: "Backspace", class: "key-backspace" },
+        ],
+        [
+          { code: "Tab", class: "key-tab" },
+          "KeyQ",
+          "KeyW",
+          "KeyE",
+          "KeyR",
+          "KeyT",
+          "KeyY",
+          "KeyU",
+          "KeyI",
+          "KeyO",
+          "KeyP",
+          "BracketLeft",
+          "BracketRight",
+          "Backslash",
+        ],
+        [
+          { code: "CapsLock", class: "key-caps" },
+          "KeyA",
+          "KeyS",
+          "KeyD",
+          "KeyF",
+          "KeyG",
+          "KeyH",
+          "KeyJ",
+          "KeyK",
+          "KeyL",
+          "Semicolon",
+          "Quote",
+          { code: "Enter", class: "key-enter" },
+        ],
+        [
+          { code: "ShiftLeft", class: "key-shift" },
+          "KeyZ",
+          "KeyX",
+          "KeyC",
+          "KeyV",
+          "KeyB",
+          "KeyN",
+          "KeyM",
+          "Comma",
+          "Period",
+          "Slash",
+          { code: "ShiftRight", class: "key-shift" },
+        ],
+        [
+          { code: "ControlLeft", class: "key-ctrl" },
+          { code: "MetaLeft", text: "Win" },
+          { code: "AltLeft", class: "key-alt" },
+          { code: "Space", class: "key-space" },
+          { code: "AltRight", class: "key-alt" },
+          { code: "MetaRight", text: "Win" },
+          "ContextMenu",
+          { code: "ControlRight", class: "key-ctrl" },
+        ],
+      ];
+
+      keyLayout.forEach((row) => {
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "key-row";
+        row.forEach((key) => {
+          const keyDiv = document.createElement("div");
+          const keyObj = typeof key === "object" ? key : { code: key };
+          keyDiv.className = "key";
+          if (keyObj.class) {
+            keyDiv.classList.add(keyObj.class);
+          }
+          keyDiv.dataset.code = keyObj.code;
+          keyDiv.textContent =
+            keyObj.text ||
+            keyObj.code.replace(/^(Key|Digit|Shift|Control|Alt)/, "");
+          if (keyObj.code === "Backquote") keyDiv.textContent = "`";
+          rowDiv.appendChild(keyDiv);
+        });
+        keyboardLayoutDiv.appendChild(rowDiv);
+      });
+
+      window.addEventListener("keydown", (e) => {
+        e.preventDefault();
+        const keyElement = document.querySelector(
+          `.key[data-code="${e.code}"]`
+        );
+        if (keyElement) {
+          keyElement.classList.add("active");
+        }
+        keyDisplay.textContent = e.key;
+        codeDisplay.textContent = e.code;
+        whichDisplay.textContent = e.which;
+        locationDisplay.textContent =
+          e.location === 0 ? "General" : e.location === 1 ? "Left" : "Right";
+      });
+
+      window.addEventListener("keyup", (e) => {
+        const keyElement = document.querySelector(
+          `.key[data-code="${e.code}"]`
+        );
+        if (keyElement) {
+          keyElement.classList.remove("active");
+        }
+      });
+
+      const mouseArea = document.getElementById("mouse-area");
+      const xCoord = document.getElementById("x-coord");
+      const yCoord = document.getElementById("y-coord");
+      const mouseButton = document.getElementById("mouse-button");
+      const mouseScroll = document.getElementById("mouse-scroll");
+
+      mouseArea.addEventListener("mousemove", (e) => {
+        xCoord.textContent = e.offsetX;
+        yCoord.textContent = e.offsetY;
+      });
+
+      mouseArea.addEventListener("mousedown", (e) => {
+        let buttonName = "-";
+        switch (e.button) {
+          case 0:
+            buttonName = "Kiri";
+            break;
+          case 1:
+            buttonName = "Tengah";
+            break;
+          case 2:
+            buttonName = "Kanan";
+            break;
+          case 3:
+            buttonName = "Browser Back";
+            break;
+          case 4:
+            buttonName = "Browser Forward";
+            break;
+        }
+        mouseButton.textContent = buttonName;
+      });
+
+      mouseArea.addEventListener("mouseup", () => {
+        mouseButton.textContent = "-";
+      });
+
+      mouseArea.addEventListener("wheel", (e) => {
+        mouseScroll.textContent = e.deltaY > 0 ? "Bawah" : "Atas";
+        setTimeout(() => (mouseScroll.textContent = "-"), 500);
+      });
+
+      mouseArea.addEventListener("contextmenu", (e) => e.preventDefault());
+
+      const gamepadStatus = document.getElementById("gamepad-status");
+      const gamepadDisplay = document.getElementById("gamepad-display");
+      const gamepadInfo = document.getElementById("gamepad-info");
+      const buttonsDiv = document.getElementById("gamepad-buttons");
+      const axesDiv = document.getElementById("gamepad-axes");
+      let connectedGamepad = null;
+
+      window.addEventListener("gamepadconnected", (e) => {
+        console.log(
+          "Gamepad terhubung di index %d: %s. %d tombol, %d sumbu.",
+          e.gamepad.index,
+          e.gamepad.id,
+          e.gamepad.buttons.length,
+          e.gamepad.axes.length
+        );
+
+        connectedGamepad = e.gamepad;
+        gamepadDisplay.classList.add("connected");
+        gamepadStatus.textContent = `Gamepad Terhubung: ${connectedGamepad.id}`;
+        setupGamepadUI(connectedGamepad);
+        updateGamepadStatus();
+      });
+
+      window.addEventListener("gamepaddisconnected", (e) => {
+        console.log(
+          "Gamepad terputus dari index %d: %s",
+          e.gamepad.index,
+          e.gamepad.id
+        );
+        connectedGamepad = null;
+        gamepadDisplay.classList.remove("connected");
+        gamepadStatus.textContent = "Menunggu koneksi gamepad...";
+        gamepadInfo.innerHTML = "";
+        buttonsDiv.innerHTML = "<h3>Tombol</h3>";
+        axesDiv.innerHTML = "<h3>Sumbu (Analog)</h3>";
+      });
+
+      function setupGamepadUI(gamepad) {
+        gamepadInfo.innerHTML = `Index: ${gamepad.index} | Tombol: ${gamepad.buttons.length} | Sumbu: ${gamepad.axes.length}`;
+
+        buttonsDiv.innerHTML = "<h3>Tombol</h3>";
+        gamepad.buttons.forEach((button, index) => {
+          const btnEl = document.createElement("div");
+          btnEl.className = "button";
+          btnEl.id = `btn-${index}`;
+          btnEl.textContent = index;
+          buttonsDiv.appendChild(btnEl);
+        });
+
+        axesDiv.innerHTML = "<h3>Sumbu (Analog)</h3>";
+        for (let i = 0; i < gamepad.axes.length; i += 2) {
+          const axisContainer = document.createElement("div");
+          const axisEl = document.createElement("div");
+          axisEl.className = "axis";
+          axisEl.id = `axis-container-${i / 2}`;
+
+          const dotEl = document.createElement("div");
+          dotEl.className = "axis-dot";
+          dotEl.id = `axis-dot-${i / 2}`;
+
+          const labelEl = document.createElement("div");
+          labelEl.className = "axis-label";
+          labelEl.textContent = `Sumbu ${i}/${i + 1}`;
+
+          axisEl.appendChild(dotEl);
+          axisContainer.appendChild(axisEl);
+          axisContainer.appendChild(labelEl);
+          axesDiv.appendChild(axisContainer);
+        }
+      }
+
+      function updateGamepadStatus() {
+        if (!connectedGamepad) return;
+
+        const gamepad = navigator.getGamepads()[connectedGamepad.index];
+
+        gamepad.buttons.forEach((button, index) => {
+          const btnEl = document.getElementById(`btn-${index}`);
+          if (btnEl) {
+            if (button.pressed) {
+              btnEl.classList.add("pressed");
+              btnEl.style.background = `rgba(86, 156, 214, ${button.value})`;
+            } else {
+              btnEl.classList.remove("pressed");
+              btnEl.style.background = "";
+            }
+          }
+        });
+
+        for (let i = 0; i < gamepad.axes.length; i += 2) {
+          const dotEl = document.getElementById(`axis-dot-${i / 2}`);
+          if (dotEl) {
+            const x = gamepad.axes[i];
+            const y = gamepad.axes[i + 1] || 0;
+
+            dotEl.style.left = `${((x + 1) / 2) * 100}%`;
+            dotEl.style.top = `${((y + 1) / 2) * 100}%`;
+          }
+        }
+
+        requestAnimationFrame(updateGamepadStatus);
+      }
+    </script>
+  </body>
+</html>
